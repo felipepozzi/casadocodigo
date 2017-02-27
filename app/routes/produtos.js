@@ -1,23 +1,27 @@
 module.exports = function(app){
-   app.get('/produtos', function(req,res){
+   app.get('/produtos', function(req,res,next){
+
         var connection = app.infra.connectionFactory();
         var ProdutosDAO = new app.infra.ProdutosDAO(connection);
-        ProdutosDAO.lista(function (err, results){
-          console.log(err);
+
+        ProdutosDAO.lista(function (erros, resultados){
+          if(erros){
+              return next(erros);
+          }
             res.format({
                 html: function(){
-                  res.render('produtos/lista', {lista:results});
+                  res.render('produtos/lista', {lista:resultados});
                 },
                 json: function(){
-                  res.json(results);
+                  res.json(resultados);
                 }
             });
         });
         connection.end();
   });
 
-    app.get('/produtos/form', function(req, res){
-        res.render('produtos/form')
+    app.get('produtos/form', function(req, res){
+      res.render('produtos/form',{errosValidacao : {}, produto : {}})
     });
 
     app.post('/produtos', function(req, res){
@@ -29,13 +33,23 @@ module.exports = function(app){
 
       var erros = req.validationErrors();
       if(erros){
-        res.render('produtos/form',{errosValidacao:erros, produto:produto});
+        res.format({
+            html: function(){
+                res.status(400).render('produtos/form',{errosValidacao:erros, produto:produto});
+          },
+          json: function(){
+                res.status(400).json(erros);
+          }
+        });
+
         return;
       }
 
       var connection = app.infra.connectionFactory();
       var ProdutosDAO = new app.infra.ProdutosDAO(connection)
-      ProdutosDAO.salva(produto,function(err,results){
+
+      ProdutosDAO.salva(produto,function(erros, resultados){
+        //console.log(ProdutosDAO);
             res.redirect('/produtos');
       });
     });
