@@ -2,7 +2,11 @@
     <body>
         <form action='/promocoes' method="post">
         <div>
-            <select name="livro_id">
+            <input type="text" name="mensagem"/>
+        </div>
+
+        <div>
+            <select name="livro[id]">
                 <%for(var i=0; i<lista.length;i++){%>
                   <option value="<%lista[i].id%>"><%=lista[i].titulo%></option>
                 <%}%>

@@ -10,7 +10,7 @@ function createDBConnection(){
         });
       }
 
-      if(process.env.NODE_ENV == 'test'){
+      if(process.env.NODE_ENV == 'production'){
         return mysql.createConnection({
             host : 'localhost',
             user : 'root',
